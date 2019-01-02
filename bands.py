@@ -27,14 +27,13 @@
 import re
 import shlex
 import subprocess
-import sys
 import requests
 import xmltodict
 #
 # configuration
 #
 # set your voicerss API key here
-voicersskey = "yourvoicerssapikeygoeshere"
+voicersskey = "9d35658da86c43a6b3335136a82b4f6a"
 # set your desired voice language here
 voicersslang = "en-us"
 # set speed of speech here
