@@ -34,7 +34,7 @@ import xmltodict
 # configuration
 #
 # set your voicerss API key here
-voicersskey = "someapikeygoeshere"
+voicersskey = "yourvoicerssapikeygoeshere"
 # set your desired voice language here
 voicersslang = "en-us"
 # set speed of speech here
@@ -44,12 +44,21 @@ voicerssformat = "44khz_16bit_mono"
 #
 # end configuration
 #
+temppath = "/tmp/"
+aslpath = "/etc/asterisk/custom/"
+scriptname = "bands"
+aslfile = aslpath + "bands"
+filetxt = temppath + scriptname + ".txt"
+filemp3 = temppath + scriptname + ".mp3"
+filewav = temppath + scriptname + ".wav"
+fileul = aslfile + ".ul"
+
 xml_data = requests.get(
     url="http://www.hamqsl.com/solarxml.php"
 )
 band_data = xmltodict.parse(xml_data.text)
 
-textfile = open("/tmp/bands.txt", "w")
+textfile = open(filetxt, "w")
 
 textfile.write("There are currently %s sunspots, and a solar flux of %s. Noise floor approximately %s... Estimated band conditions follow... \r\n" %
            (
@@ -69,20 +78,19 @@ textfile.write("\rEnd of report.")
 
 textfile.close()
 
-bandreport = open("/tmp/bands.txt", "r")
+bandreport = open(filetxt, "r")
 getmp3 = requests.get("http://api.voicerss.org/",
                       data={"key": voicersskey, "r": voicerssspeed,
                             "src": bandreport, "hl": voicersslang, "f": voicerssformat}
                       )
 bandreport.close()
-mp3file = open("/tmp/bands.mp3", "wb")
+mp3file = open(filemp3, "wb")
 mp3file.write(getmp3.content)
 mp3file.close()
 # convert to wav with lame (apt-get install lame) then to ulaw with sox (apt-get install sox)
-subprocess.call(shlex.split("lame --decode /tmp/bands.mp3 /tmp/bands.wav"))
-subprocess.call(shlex.split("sox -V /tmp/bands.wav -r 8000 -c 1 -t ul /etc/asterisk/custom/bands.ul"))
+subprocess.call(shlex.split("lame --decode " + filemp3 + " " + filewav))
+subprocess.call(shlex.split("sox -V " + filewav + " -r 8000 -c 1 -t ul " + fileul))
 # cleanup
-subprocess.call(shlex.split("rm -f /tmp/bands.txt"))
-subprocess.call(shlex.split("rm -f /tmp/bands.mp3"))
-subprocess.call(shlex.split("rm -f /tmp/bands.wav"))
-
+subprocess.call(shlex.split("rm -f " + filetxt))
+subprocess.call(shlex.split("rm -f " + filemp3))
+subprocess.call(shlex.split("rm -f " + filewav))
