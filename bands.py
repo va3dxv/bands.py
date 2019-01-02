@@ -72,7 +72,7 @@ textfile.close()
 bandreport = open("/tmp/bands.txt", "r")
 getmp3 = requests.get("http://api.voicerss.org/",
                       data={"key": voicersskey, "r": voicerssspeed,
-                            "src": bands, "hl": voicersslang, "f": voicerssformat}
+                            "src": bandreport, "hl": voicersslang, "f": voicerssformat}
                       )
 bandreport.close()
 mp3file = open("/tmp/bands.mp3", "wb")
